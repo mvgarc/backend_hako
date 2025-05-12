@@ -13,7 +13,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Servir archivos estáticos
+// OJO: Servir archivos estáticos desde la carpeta "uploads"
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rutas
@@ -23,14 +23,14 @@ const catalogoRoutes = require('./routes/catalogo.routes');
 
 app.use('/api/proveedores', proveedorRoutes);
 app.use('/api/marcas', marcaRoutes);
-app.use('/api/catalogos', catalogoRoutes);
+app.use('/api/catalogos', catalogoRoutes); // ✅ Aquí está la ruta de Catálogos
 
-// Sincronización con la base de datos
+// Pendiente porque aquí Sincronización con la base de datos
 sequelize.sync()
     .then(() => {
         console.log('Conexión exitosa con la base de datos');
         app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`);
+            console.log(`Servidor corriendo en http://localhost:${PORT}`);
         });
     })
     .catch((err) => console.log('Error al conectar con la base de datos:', err));
