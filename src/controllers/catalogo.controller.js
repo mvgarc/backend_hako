@@ -12,7 +12,7 @@ const crearCatalogo = async (req, res) => {
         const catalogo = await Catalogo.create({
         nombre,
         descripcion,
-        nombreArchivo: req.file.filename
+        archivo: req.file.filename
         });
         res.status(201).json({ message: 'Catálogo creado correctamente', catalogo });
     } catch (error) {
@@ -31,7 +31,7 @@ const obtenerCatalogos = async (req, res) => {
             id: catalogo.id,
             nombre: catalogo.nombre,
             descripcion: catalogo.descripcion,
-            nombreArchivo: catalogo.nombreArchivo,
+            archivo: catalogo.archivo,
             enlaceDescarga: `${req.protocol}://${req.get('host')}/api/catalogos/download/${catalogo.id}`
         }));
         
@@ -50,18 +50,20 @@ const listarCatalogos = (req, res) => {
     
         const catalogos = files.map((filename) => {
             return {
-            filename,
-            provider: 'Proveedor X',
-            brand: 'Marca Y', 
-            publishedAt: new Date().toISOString(),
+                filename,
+                provider: 'Proveedor X',
+                brand: 'Marca Y', 
+                publishedAt: new Date().toISOString(),
             };
         });
-    }
-    catch (error) {
+
+        // Aquí es donde debe ir la respuesta correcta
+        res.status(200).json(catalogos);
+
+    } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error al listar los catálogos' });
     }
-    res.status(200).json(catalogos);
 };
 
 // Eliminar un catálogo y su archivo
@@ -75,7 +77,7 @@ const eliminarCatalogo = async (req, res) => {
         }
 
         // Eliminar archivo físico
-        const filePath = path.join(__dirname, '../uploads', catalogo.nombreArchivo);
+        const filePath = path.join(__dirname, '../uploads', catalogo.archivo);
         if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
         }
@@ -100,11 +102,11 @@ const actualizarCatalogo = async (req, res) => {
 
             // Eliminar archivo físico anterior si se sube uno nuevo
             if (req.file) {
-                const filePath = path.join(__dirname, '../uploads', catalogo.nombreArchivo);
+                const filePath = path.join(__dirname, '../uploads', catalogo.archivo);
                 if (fs.existsSync(filePath)) {
                     fs.unlinkSync(filePath);
                 }
-                catalogo.nombreArchivo = req.file.filename;
+                catalogo.archivo = req.file.filename;
             }
 
             catalogo.nombre = nombre || catalogo.nombre;
@@ -130,11 +132,11 @@ const descargarCatalogo = async (req, res) => {
         }
     
         // Ruta absoluta del archivo
-        const filePath = path.join(__dirname, '../uploads', catalogo.nombreArchivo);
+        const filePath = path.join(__dirname, '../uploads', catalogo.archivo);
     
         // Verifica si el archivo existe
         if (fs.existsSync(filePath)) {
-            res.download(filePath, catalogo.nombreArchivo);
+            res.download(filePath, catalogo.archivo);
         } else {
             res.status(404).json({ message: 'Archivo no encontrado en el servidor' });
         }
