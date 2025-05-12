@@ -46,22 +46,28 @@ const obtenerCatalogos = async (req, res) => {
 const listarCatalogos = (req, res) => {
     try {
         const directoryPath = path.join(__dirname, '../uploads');
+
+        // Verificar si la carpeta existe
+        if (!fs.existsSync(directoryPath)) {
+            return res.status(404).json({ message: 'No se encontró el directorio de uploads.' });
+        }
+
         const files = fs.readdirSync(directoryPath);
-    
+
+        // Definimos catalogos antes de usarlo en el map
         const catalogos = files.map((filename) => {
             return {
                 filename,
                 provider: 'Proveedor X',
-                brand: 'Marca Y', 
+                brand: 'Marca Y',
                 publishedAt: new Date().toISOString(),
             };
         });
 
-        // Aquí es donde debe ir la respuesta correcta
         res.status(200).json(catalogos);
 
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
         res.status(500).json({ message: 'Error al listar los catálogos' });
     }
 };
