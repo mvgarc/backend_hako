@@ -24,10 +24,10 @@ const crearCatalogo = async (req, res) => {
 // Obtener catálogos
 const obtenerCatalogos = async (req, res) => {
     try {
-        const catalogos = await Catalogo.findAll();
+        const catalogo = await Catalogo.findAll();
     
         // Generar un enlace de descarga para cada catálogo
-        const catalogosConEnlace = catalogos.map((catalogo) => ({
+        const catalogosConEnlace = catalogo.map((catalogo) => ({
             id: catalogo.id,
             nombre: catalogo.nombre,
             descripcion: catalogo.descripcion,
@@ -44,18 +44,21 @@ const obtenerCatalogos = async (req, res) => {
 };
 
 const listarCatalogos = (req, res) => {
+    let catalogos; // Declarar 'catalogos' fuera del try
     try {
         const directoryPath = path.join(__dirname, '../uploads');
 
-        // Verificar si la carpeta existe
+        // Verificar si el directorio existe
         if (!fs.existsSync(directoryPath)) {
-            return res.status(404).json({ message: 'No se encontró el directorio de uploads.' });
+            console.log("La carpeta 'uploads' no existe.");
+            return res.status(404).json({ message: 'Directorio de uploads no encontrado.' });
         }
 
+        // Leer los archivos del directorio
         const files = fs.readdirSync(directoryPath);
 
-        // Definimos catalogos antes de usarlo en el map
-        const catalogos = files.map((filename) => {
+        // Definir "catalogos" correctamente
+        catalogos = files.map((filename) => {
             return {
                 filename,
                 provider: 'Proveedor X',
@@ -64,11 +67,12 @@ const listarCatalogos = (req, res) => {
             };
         });
 
+        // Responder con el arreglo de "catalogos"
         res.status(200).json(catalogos);
 
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ message: 'Error al listar los catálogos' });
+        res.status(500).json({ message: 'Error al listar los catálogos', error: error.message });
     }
 };
 
