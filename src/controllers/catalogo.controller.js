@@ -6,6 +6,9 @@ const fs = require('fs');
 const crearCatalogo = async (req, res) => {
     try {
         const { nombre, descripcion } = req.body;
+        console.log("req.file:", req.file); // Debe mostrar los datos del archivo
+        console.log("req.body:", req.body); // Debe mostrar nombre y descripción
+
         const catalogo = await Catalogo.create({
         nombre,
         descripcion,
