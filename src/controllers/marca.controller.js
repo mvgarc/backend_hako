@@ -2,6 +2,18 @@ const Marca = require('../models/Marca');
 const multer = require ('multer');
 const path = require('path');
 
+// Configuración de Multer para almacenamiento de archivos
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Carpeta donde se guardarán los logos
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}${path.extname(file.originalname)}`); // Nombre único con timestamp
+    },
+});
+
+const upload = multer({ storage });
+
 // Obtener todas las marcas
 const getMarcas = async (req, res) => {
     try {
@@ -16,8 +28,16 @@ const getMarcas = async (req, res) => {
 // Crear una nueva marca
 const createMarca = async (req, res) => {
     try {
-        const { nombre, logo } = req.body;
-        const nuevaMarca = await Marca.create({ nombre, logo });
+        const { nombre } = req.body;
+        let logoPath = null;
+
+        // Verifica si hay un archivo subido
+        if (req.file) {
+            logoPath = `uploads/${req.file.filename}`;
+        }
+
+        // Crea el registro en la base de datos
+        const nuevaMarca = await Marca.create({ nombre, logo: logoPath });
         res.status(201).json(nuevaMarca);
     } catch (error) {
         console.error(error.message);
@@ -46,16 +66,21 @@ const getMarcaById = async (req, res) => {
 const updateMarca = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, logo } = req.body;
+        const { nombre} = req.body;
+        let logoPath = null;
 
         const marca = await Marca.findByPk(id);
 
         if (!marca) {
-        return res.status(404).json({ message: 'Marca no encontrada' });
+            return res.status(404).json({ message: 'Marca no encontrada' });
+        }
+
+        if (req.file) {
+            logoPath = `uploads/${req.file.filename}`;
+            marca.logo = logoPath;
         }
 
         marca.nombre = nombre;
-        marca.logo = logo;
 
         await marca.save();
         res.status(200).json(marca);
@@ -85,8 +110,8 @@ const deleteMarca = async (req, res) => {
 
 module.exports = {
     getMarcas,
-    createMarca,
+    createMarca: [upload.single('logo'), createMarca], // Middleware para subir el archivo
     getMarcaById,
-    updateMarca,
+    updateMarca: [upload.single('logo'), updateMarca], // Middleware para subir el archivo
     deleteMarca,
 };
