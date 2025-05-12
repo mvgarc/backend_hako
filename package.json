@@ -2,14 +2,22 @@
   "name": "backend_hako",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "homepage": "https://github.com/mvgarc/backend_hako#readme",
+  "bugs": {
+    "url": "https://github.com/mvgarc/backend_hako/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mvgarc/backend_hako.git"
+  },
+  "license": "MIT",
+  "author": "mvgarc",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
