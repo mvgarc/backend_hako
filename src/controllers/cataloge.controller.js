@@ -52,7 +52,8 @@ const eliminarCatalogo = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: 'Error al eliminar el catálogo' });
     }
-    const actualizarCatalogo = async (req, res) => {
+};
+const actualizarCatalogo = async (req, res) => {
         try {
             const { id } = req.params;
             const { nombre, descripcion } = req.body;
@@ -81,7 +82,6 @@ const eliminarCatalogo = async (req, res) => {
             console.error(error);
             res.status(500).json({ message: 'Error al actualizar el catálogo' });
         }
-    }
 };
 
 module.exports = {
