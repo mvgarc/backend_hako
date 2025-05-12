@@ -7,7 +7,8 @@ const {
     obtenerCatalogos, 
     eliminarCatalogo, 
     actualizarCatalogo, 
-    descargarCatalogo 
+    descargarCatalogo, 
+    listarCatalogos
 } = require('../controllers/catalogo.controller');
 
 // Configuración de Multer para guardar archivos
@@ -24,6 +25,7 @@ const upload = multer({ storage });
 
 // OJO: Ruta para subir un archivo y guardar en DB
 router.post('/upload', upload.single('archivo'), crearCatalogo);
+router.get('/list', listarCatalogos);
 
 // OJO: Ruta para obtener todos los catálogos
 router.get('/', obtenerCatalogos);

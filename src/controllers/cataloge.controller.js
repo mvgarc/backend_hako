@@ -22,11 +22,43 @@ const crearCatalogo = async (req, res) => {
 const obtenerCatalogos = async (req, res) => {
     try {
         const catalogos = await Catalogo.findAll();
-        res.status(200).json(catalogos);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error al obtener catálogos' });
+    
+        // Generar un enlace de descarga para cada catálogo
+        const catalogosConEnlace = catalogos.map((catalogo) => ({
+            id: catalogo.id,
+            nombre: catalogo.nombre,
+            descripcion: catalogo.descripcion,
+            nombreArchivo: catalogo.nombreArchivo,
+            enlaceDescarga: `${req.protocol}://${req.get('host')}/api/catalogos/download/${catalogo.id}`
+        }));
+        
+        res.status(200).json(catalogosConEnlace);
+    
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error al obtener catálogos' });
     }
+};
+
+const listarCatalogos = (req, res) => {
+    try {
+        const directoryPath = path.join(__dirname, '../uploads');
+        const files = fs.readdirSync(directoryPath);
+    
+        const catalogos = files.map((filename) => {
+            return {
+            filename,
+            provider: 'Proveedor X',
+            brand: 'Marca Y', 
+            publishedAt: new Date().toISOString(),
+            };
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al listar los catálogos' });
+    }
+    res.status(200).json(catalogos);
 };
 
 // Eliminar un catálogo y su archivo
