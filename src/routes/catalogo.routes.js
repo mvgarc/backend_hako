@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Ruta para subir un archivo
+// Ruta para subir un archivo y grudarlo en la base de datos
 router.post('/upload', upload.single('archivo'), (req, res) => {
     if (req.file) {
         res.status(200).json({
