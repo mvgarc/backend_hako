@@ -147,5 +147,6 @@ module.exports = {
     obtenerCatalogos,
     eliminarCatalogo,
     actualizarCatalogo,
-    descargarCatalogo
+    descargarCatalogo,
+    listarCatalogos
 };
