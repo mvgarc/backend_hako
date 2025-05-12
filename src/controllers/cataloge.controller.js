@@ -1,45 +1,61 @@
 const Catalogo = require('../models/Catalogo');
+const path = require('path');
+const fs = require('fs');
 
-// Función para crear un nuevo catálogo
+// Crear un catálogo
 const crearCatalogo = async (req, res) => {
     try {
-        const { nombre } = req.body;
-        const archivo = req.file ? req.file.filename : null;
-
-        if (!nombre || !archivo) {
-        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
-        }
-
-        const nuevoCatalogo = await Catalogo.create({
+        const { nombre, descripcion } = req.body;
+        const catalogo = await Catalogo.create({
         nombre,
-        archivo,
+        descripcion,
+        nombreArchivo: req.file.filename
         });
-
-        res.status(201).json({
-        message: 'Catálogo creado exitosamente',
-        data: nuevoCatalogo,
-        });
+        res.status(201).json({ message: 'Catálogo creado correctamente', catalogo });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error al crear el catálogo' });
     }
 };
 
-// Función para obtener todos los catálogos
+// Obtener catálogos
 const obtenerCatalogos = async (req, res) => {
     try {
         const catalogos = await Catalogo.findAll();
-        res.status(200).json({
-        message: 'Catálogos obtenidos exitosamente',
-        data: catalogos,
-        });
+        res.status(200).json(catalogos);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error al obtener los catálogos' });
+        res.status(500).json({ message: 'Error al obtener catálogos' });
+    }
+};
+
+// Eliminar un catálogo y su archivo
+const eliminarCatalogo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const catalogo = await Catalogo.findByPk(id);
+
+        if (!catalogo) {
+        return res.status(404).json({ message: 'Catálogo no encontrado' });
+        }
+
+        // Eliminar archivo físico
+        const filePath = path.join(__dirname, '../uploads', catalogo.nombreArchivo);
+        if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        }
+
+        await catalogo.destroy();
+        res.status(200).json({ message: 'Catálogo eliminado correctamente' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al eliminar el catálogo' });
     }
 };
 
 module.exports = {
     crearCatalogo,
     obtenerCatalogos,
+    eliminarCatalogo
 };
