@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const { crearCatalogo, obtenerCatalogos } = require('../controllers/catalogo.controller');
+const { crearCatalogo, obtenerCatalogos, eliminarCatalogo } = require('../controllers/catalogo.controller');
 
 // Configuración de Multer para guardar archivos
 const storage = multer.diskStorage({
@@ -21,5 +21,8 @@ router.post('/upload', upload.single('archivo'), crearCatalogo);
 
 // OJO: Ruta para obtener todos los catálogos
 router.get('/', obtenerCatalogos);
+
+// OJO: Ruta para eliminar un catálogo y su archivo
+router.delete('/:id', eliminarCatalogo);
 
 module.exports = router;
