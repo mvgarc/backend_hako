@@ -84,6 +84,20 @@ const actualizarCatalogo = async (req, res) => {
         }
 };
 
+// Descargar un catálogo
+const descargarCatalogo = async (req, res) => {
+    try{
+        const { id } = req.params;
+        const catalogo = await Catalogo.findByPk(id);
+
+        if (!catalogo) {
+            return res.status(404).json({ message: 'Catálogo no encontrado' });
+        }
+
+        const filePath = path.join(__dirname, '../uploads', catalogo.nombreArchivo);
+        res.download(filePath, catalogo.nombreArchivo);
+    }
+
 module.exports = {
     crearCatalogo,
     obtenerCatalogos,
