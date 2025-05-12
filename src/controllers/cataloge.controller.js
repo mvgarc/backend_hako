@@ -114,5 +114,6 @@ module.exports = {
     crearCatalogo,
     obtenerCatalogos,
     eliminarCatalogo,
-    actualizarCatalogo
+    actualizarCatalogo,
+    descargarCatalogo
 };
