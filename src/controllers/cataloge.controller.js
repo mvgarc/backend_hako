@@ -10,10 +10,9 @@ const crearCatalogo = async (req, res) => {
         return res.status(400).json({ message: 'Todos los campos son obligatorios' });
         }
 
-        // Guardar en la base de datos
         const nuevoCatalogo = await Catalogo.create({
         nombre,
-        archivo
+        archivo,
         });
 
         res.status(201).json({
@@ -26,6 +25,21 @@ const crearCatalogo = async (req, res) => {
     }
 };
 
+// Función para obtener todos los catálogos
+const obtenerCatalogos = async (req, res) => {
+    try {
+        const catalogos = await Catalogo.findAll();
+        res.status(200).json({
+        message: 'Catálogos obtenidos exitosamente',
+        data: catalogos,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener los catálogos' });
+    }
+};
+
 module.exports = {
     crearCatalogo,
+    obtenerCatalogos,
 };
