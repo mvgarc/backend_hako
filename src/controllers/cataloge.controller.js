@@ -86,17 +86,29 @@ const actualizarCatalogo = async (req, res) => {
 
 // Descargar un catálogo
 const descargarCatalogo = async (req, res) => {
-    try{
+        try {
         const { id } = req.params;
         const catalogo = await Catalogo.findByPk(id);
-
+    
         if (!catalogo) {
             return res.status(404).json({ message: 'Catálogo no encontrado' });
         }
-
+    
+        // Ruta absoluta del archivo
         const filePath = path.join(__dirname, '../uploads', catalogo.nombreArchivo);
-        res.download(filePath, catalogo.nombreArchivo);
-    }
+    
+        // Verifica si el archivo existe
+        if (fs.existsSync(filePath)) {
+            res.download(filePath, catalogo.nombreArchivo);
+        } else {
+            res.status(404).json({ message: 'Archivo no encontrado en el servidor' });
+        }
+    
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al descargar el catálogo' });
+        }
+};
 
 module.exports = {
     crearCatalogo,
