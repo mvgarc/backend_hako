@@ -1,4 +1,6 @@
 const Marca = require('../models/Marca');
+const multer = require ('multer');
+const path = require('path');
 
 // Obtener todas las marcas
 const getMarcas = async (req, res) => {
