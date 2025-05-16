@@ -137,3 +137,6 @@ dist
 *pdf
 *.pdf
 *.docx
+*.jpg
+*.jpeg
+*.png
