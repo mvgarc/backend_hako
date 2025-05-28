@@ -23,7 +23,7 @@ const catalogoRoutes = require('./routes/catalogo.routes');
 
 app.use('/api/proveedores', proveedorRoutes);
 app.use('/api/marcas', marcaRoutes);
-app.use('/api/catalogos', catalogoRoutes); // ✅ Aquí está la ruta de Catálogos
+app.use('/api/catalogos', catalogoRoutes);
 
 // Pendiente porque aquí Sincronización con la base de datos
 sequelize.sync()
