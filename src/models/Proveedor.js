@@ -22,7 +22,7 @@ const Proveedor = sequelize.define('Proveedor', {
         type: DataTypes.STRING
     }
 }, {
-    tableName: 'Proveedores', 
+    tableName: 'Proveedor', 
     freezeTableName: true
 });
 
