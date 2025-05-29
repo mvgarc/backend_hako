@@ -20,25 +20,26 @@ const Catalogo = sequelize.define('Catalogo', {
     proveedorId: {
         type: DataTypes.INTEGER,
         references: {
-        model: Proveedor,
-        key: 'id'
+            model: Proveedor,
+            key: 'id'
         }
     },
     marcaId: {
         type: DataTypes.INTEGER,
         references: {
-        model: Marca,
-        key: 'id'
+            model: Marca,
+            key: 'id'
         }
     }
-    }, {
+}, {
     tableName: 'catalogos',
     timestamps: false
 });
 
-// Relaciones
+// Relaciones (corrección de nombres y claves foráneas)
 Proveedor.hasMany(Catalogo, { foreignKey: 'proveedorId' });
 Marca.hasMany(Catalogo, { foreignKey: 'marcaId' });
+
 Catalogo.belongsTo(Proveedor, { foreignKey: 'proveedorId' });
 Catalogo.belongsTo(Marca, { foreignKey: 'marcaId' });
 
