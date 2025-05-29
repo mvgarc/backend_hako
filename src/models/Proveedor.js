@@ -21,6 +21,9 @@ const Proveedor = sequelize.define('Proveedor', {
     nombreEmpresa: {
         type: DataTypes.STRING
     }
+}, {
+    tableName: 'Proveedores', 
+    freezeTableName: true
 });
 
 module.exports = Proveedor;
