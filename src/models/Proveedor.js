@@ -12,6 +12,9 @@ const Proveedor = sequelize.define('Proveedor', {
     vendedor: {
         type: DataTypes.STRING
     },
+    telefono: {
+        type: DataTypes.STRING
+    },
     direccionFiscal: {
         type: DataTypes.STRING
     },
