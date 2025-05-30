@@ -1,3 +1,5 @@
+// index.js
+
 require('dotenv').config();
 const express = require('express');
 const sequelize = require('./config/db');
@@ -36,11 +38,15 @@ app.use('/api/marcas', marcaRoutes);
 app.use('/api/catalogos', catalogoRoutes);
 
 // Pendiente porque aquí Sincronización con la base de datos
-sequelize.sync()
+// ===> C A M B I A   A Q U Í <===
+// Reemplaza la siguiente línea:
+// sequelize.sync()
+// Con esta nueva línea:
+sequelize.sync({ alter: true }) // <--- ¡CAMBIO CRÍTICO AQUÍ!
     .then(() => {
-        console.log('Conexión exitosa con la base de datos');
+        console.log('Conexión exitosa con la base de datos y modelos sincronizados (tablas recreadas).');
         app.listen(PORT, () => {
             console.log(`Servidor corriendo en http://localhost:${PORT}`);
         });
     })
-    .catch((err) => console.log('Error al conectar con la base de datos:', err));
+    .catch((err) => console.log('Error al conectar o sincronizar con la base de datos:', err));
