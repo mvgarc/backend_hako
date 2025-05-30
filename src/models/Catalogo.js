@@ -9,22 +9,22 @@ const Catalogo = sequelize.define('Catalogo', {
         primaryKey: true,
         autoIncrement: true
     },
-    nombre: {
+    nombre: { // Este es el campo que usaremos para req.file.originalname
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false // Asegúrate de que esto sea lo que quieres
     },
     archivo: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    proveedorId: {
+    proveedorId: { // Este es el campo que recibirá req.body.provider
         type: DataTypes.INTEGER,
         references: {
             model: Proveedor,
             key: 'id'
         }
     },
-    marcaId: {
+    marcaId: { // Este es el campo que recibirá req.body.marcaId
         type: DataTypes.INTEGER,
         references: {
             model: Marca,
