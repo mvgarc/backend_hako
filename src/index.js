@@ -42,7 +42,7 @@ app.use('/api/catalogos', catalogoRoutes);
 // Reemplaza la siguiente línea:
 // sequelize.sync()
 // Con esta nueva línea:
-sequelize.sync({ alter: true }) // <--- ¡CAMBIO CRÍTICO AQUÍ!
+sequelize.sync({ alter: true })
     .then(() => {
         console.log('Conexión exitosa con la base de datos y modelos sincronizados (tablas recreadas).');
         app.listen(PORT, () => {
