@@ -11,7 +11,7 @@ const Catalogo = sequelize.define('Catalogo', {
     },
     nombre: { // Este es el campo que usaremos para req.file.originalname
         type: DataTypes.STRING,
-        allowNull: false // Asegúrate de que esto sea lo que quieres
+        allowNull: false
     },
     archivo: {
         type: DataTypes.STRING,
@@ -33,13 +33,10 @@ const Catalogo = sequelize.define('Catalogo', {
     }
 }, {
     tableName: 'catalogos',
-    timestamps: false
+    timestamps: false // ¡Importante! Esto significa que no habrá createdAt/updatedAt en tu tabla 'catalogos'
 });
 
-// Relaciones (corrección de nombres y claves foráneas)
-Proveedor.hasMany(Catalogo, { foreignKey: 'proveedorId' });
-Marca.hasMany(Catalogo, { foreignKey: 'marcaId' });
-
+// Relaciones para Catalogo (este "pertenece a" un Proveedor y una Marca)
 Catalogo.belongsTo(Proveedor, { foreignKey: 'proveedorId' });
 Catalogo.belongsTo(Marca, { foreignKey: 'marcaId' });
 
