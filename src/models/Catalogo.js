@@ -9,7 +9,7 @@ const Catalogo = sequelize.define('Catalogo', {
         primaryKey: true,
         autoIncrement: true
     },
-    nombre: { // Este es el campo que usaremos para req.file.originalname
+    nombre: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -17,26 +17,31 @@ const Catalogo = sequelize.define('Catalogo', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    proveedorId: { // Este es el campo que recibirá req.body.provider
+    proveedorId: {
         type: DataTypes.INTEGER,
         references: {
             model: Proveedor,
             key: 'id'
         }
     },
-    marcaId: { // Este es el campo que recibirá req.body.marcaId
+    marcaId: {
         type: DataTypes.INTEGER,
         references: {
             model: Marca,
             key: 'id'
         }
+    },
+    publishedAt: {
+        type: DataTypes.DATE, // Tipo de dato DATE para fechas y horas
+        allowNull: false, // Asegura que siempre tenga una fecha
+        defaultValue: DataTypes.NOW // Establece la fecha y hora actual por defecto
     }
 }, {
     tableName: 'catalogos',
-    timestamps: false // ¡Importante! Esto significa que no habrá createdAt/updatedAt en tu tabla 'catalogos'
+    timestamps: false // Lo mantienes en false porque quieres un campo específico
 });
 
-// Relaciones para Catalogo (este "pertenece a" un Proveedor y una Marca)
+// Relaciones (mantén estas relaciones tal cual, o asegúrate de que están en associations.js)
 Catalogo.belongsTo(Proveedor, { foreignKey: 'proveedorId' });
 Catalogo.belongsTo(Marca, { foreignKey: 'marcaId' });
 

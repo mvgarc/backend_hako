@@ -1,14 +1,14 @@
-// src/controllers/catalogo.controller.js
-
 const Catalogo = require('../models/Catalogo');
+const Proveedor = require('../models/Proveedor'); 
+const Marca = require('../models/Marca');       
 const path = require('path');
 const fs = require('fs');
 
-// Crear un catálogo (esta función ahora espera 'archivo', 'provider' y 'marcaId' del frontend)
+// Crear un catálogo (esta función ahora espera 'archivo', 'providerId' y 'marcaId' del frontend)
 const crearCatalogo = async (req, res) => {
     try {
         // req.file contiene la información del archivo subido por Multer
-        // req.body contendrá los campos de texto como 'provider' y 'marcaId'
+        // req.body contendrá los campos de texto como 'providerId' y 'marcaId'
         console.log("req.file (en controller):", req.file); // Para depuración del archivo
         console.log("req.body (en controller):", req.body); // Para depuración de los campos de texto
 
@@ -16,10 +16,12 @@ const crearCatalogo = async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ message: 'No se ha subido ningún archivo.' });
         }
-        if (!req.body.provider) { // Asegúrate de que este es el nombre del campo en tu frontend (formData.append("provider", ...))
+        // Nota: En tu frontend, si el campo se llama 'provider' en el formData,
+        // aquí será req.body.provider. Asegúrate de que el nombre del campo coincida.
+        if (!req.body.provider) { // <-- Se espera 'provider' del frontend, que mapea a 'proveedorId'
             return res.status(400).json({ message: 'Falta el ID del proveedor.' });
         }
-        if (!req.body.marcaId) { // Asegúrate de que este es el nombre del campo en tu frontend (formData.append("marcaId", ...))
+        if (!req.body.marcaId) { // <-- Se espera 'marcaId' del frontend
             return res.status(400).json({ message: 'Falta el ID de la marca.' });
         }
 
@@ -32,7 +34,8 @@ const crearCatalogo = async (req, res) => {
             archivo: req.file.filename, // Multer guarda el archivo con un nombre único en 'uploads/'
             proveedorId: req.body.provider, // Mapea al campo proveedorId en tu modelo Catalogo
             marcaId: req.body.marcaId // Mapea al campo marcaId en tu modelo Catalogo
-            // Nota: Si 'descripcion' no está en tu modelo o es opcional, no lo incluyas aquí a menos que lo envíes desde el frontend.
+            // Nota: Si 'descripcion' o 'publishedAt' no están en tu modelo Catalogo o son opcionales,
+            // no los incluyas aquí a menos que los envíes desde el frontend y los tengas en tu modelo.
         });
         
         res.status(201).json({ message: 'Catálogo creado correctamente', catalogo });
@@ -43,53 +46,82 @@ const crearCatalogo = async (req, res) => {
             const errors = error.errors.map(err => err.message);
             return res.status(400).json({ message: 'Error de validación al crear el catálogo', errors });
         }
+        // Manejo específico para errores de clave foránea
+        if (error.name === 'SequelizeForeignKeyConstraintError') {
+            return res.status(400).json({ message: 'Error de clave foránea: El proveedor o la marca especificados no existen.', details: error.message });
+        }
         res.status(500).json({ message: 'Error al crear el catálogo', details: error.message });
     }
 };
 
-// Obtener todos los catálogos (para mostrar en la tabla, por ejemplo)
+// Obtener todos los catálogos (para mostrar en la tabla de reportes)
 const obtenerCatalogos = async (req, res) => {
     try {
-        const catalogo = await Catalogo.findAll(); // Busca todos los catálogos en la DB
+        const catalogos = await Catalogo.findAll({
+            // ===> ESTA ES LA CLAVE PARA TRAER LOS NOMBRES DE PROVEEDORES Y MARCAS <===
+            include: [
+                {
+                    model: Proveedor, // Incluye el modelo Proveedor
+                    attributes: ['nombre'] // Solo trae el campo 'nombre' del Proveedor
+                },
+                {
+                    model: Marca,     // Incluye el modelo Marca
+                    attributes: ['nombre'] // Solo trae el campo 'nombre' de la Marca
+                }
+            ]
+        });
         
-        // Mapea los catálogos para incluir un enlace de descarga (si aplica)
-        const catalogosConEnlace = catalogo.map((catalogo) => ({
-            id: catalogo.id,
-            nombre: catalogo.nombre,
-            // descripcion: catalogo.descripcion, // Incluir si tu modelo tiene 'descripcion'
-            archivo: catalogo.archivo,
-            // Genera el enlace de descarga completo para el frontend
-            enlaceDescarga: `${req.protocol}://${req.get('host')}/api/catalogos/download/${catalogo.id}`
-        }));
+        // Mapea los catálogos para incluir la información completa necesaria para el frontend
+        const catalogosConInfoCompleta = catalogos.map((item) => {
+            // Accede a los nombres de las relaciones. Sequelize adjunta el modelo
+            // relacionado como una propiedad con el nombre del modelo.
+            const proveedorNombre = item.Proveedor ? item.Proveedor.nombre : 'Desconocido';
+            const marcaNombre = item.Marca ? item.Marca.nombre : 'Desconocida';
+
+            return {
+                id: item.id,
+                filename: item.nombre, // 'nombre' del catálogo es el nombre original del archivo
+                provider: proveedorNombre,
+                brand: marcaNombre,
+                // publishedAt: Como tu modelo Catalogo tiene timestamps: false, 'createdAt' no existe en la DB.
+                // Si necesitas una fecha de publicación, deberías añadir un campo 'publishedAt' (DataTypes.DATE)
+                // a tu modelo Catalogo y gestionarlo manualmente al crear.
+                // Por ahora, pondremos un valor por defecto que el frontend pueda manejar.
+                publishedAt: 'N/A', // O puedes poner una fecha fija, o dejarlo vacío si tu frontend lo acepta
+                notes: "", // Si tu modelo Catalogo tiene un campo 'notes', lo mapearías aquí: item.notes
+                enlaceDescarga: `${req.protocol}://${req.get('host')}/api/catalogos/download/${item.id}`
+            };
+        });
         
-        res.status(200).json(catalogosConEnlace);
+        res.status(200).json(catalogosConInfoCompleta);
     } catch (error) {
         console.error("Error al obtener catálogos:", error);
         res.status(500).json({ message: 'Error al obtener catálogos', details: error.message });
     }
 };
 
-// Listar catálogos por archivos en el directorio 'uploads'
+// Listar catálogos por archivos en el directorio 'uploads' (Esta función no usa la DB para detalles)
+// Si quieres que esta función también devuelva los detalles de la DB, deberías modificarla
+// para hacer consultas a la DB.
 const listarCatalogos = (req, res) => {
     try {
         const directoryPath = path.join(__dirname, '../uploads');
 
         if (!fs.existsSync(directoryPath)) {
             console.log("La carpeta 'uploads' no existe.");
-            // Considera crearla si no existe, o asegúrate de que el proceso de Node.js tenga permisos para crearla.
             return res.status(404).json({ message: 'Directorio de uploads no encontrado.' });
         }
 
         const files = fs.readdirSync(directoryPath); // Lee los nombres de los archivos en el directorio
 
         // Esto es una lista simple de archivos. Si necesitas más detalles (proveedor, marca),
-        // deberías consultar tu base de datos en lugar de solo el sistema de archivos.
+        // deberías consultar tu base de datos en lugar de solo el sistema de archivos (similar a obtenerCatalogos).
         const catalogos = files.map((filename) => {
             return {
                 filename,
                 provider: 'Proveedor X', // Estos son valores estáticos, deberías obtenerlos de la DB
                 brand: 'Marca Y',     // Estos son valores estáticos, deberías obtenerlos de la DB
-                publishedAt: new Date().toISOString(),
+                publishedAt: new Date().toISOString(), // Fecha actual del servidor
             };
         });
 
@@ -128,8 +160,6 @@ const eliminarCatalogo = async (req, res) => {
 const actualizarCatalogo = async (req, res) => {
     try {
         const { id } = req.params;
-        // nombre y descripcion solo se esperan si los vas a manejar en el frontend para actualizar
-        // o si los tomas de req.body
         const { nombre, descripcion, proveedorId, marcaId } = req.body; // Incluir los campos que esperas actualizar
 
         const catalogo = await Catalogo.findByPk(id);
@@ -175,7 +205,7 @@ const descargarCatalogo = async (req, res) => {
         const filePath = path.join(__dirname, '../uploads', catalogo.archivo); // Ruta al archivo físico
         
         if (fs.existsSync(filePath)) {
-            res.download(filePath, catalogo.archivo); // Envía el archivo para descarga
+            res.download(filePath, catalogo.nombre); // Envía el archivo para descarga, usando el nombre original
         } else {
             res.status(404).json({ message: 'Archivo no encontrado en el servidor' });
         }
