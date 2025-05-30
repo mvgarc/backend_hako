@@ -7,9 +7,19 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const corsOptions = {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+    allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas en las solicitudes
+    credentials: true, // Habilita el envío de cookies o credenciales (si tu frontend las envía)
+    optionsSuccessStatus: 200 // Algunas versiones antiguas de navegadores (IE11, varios SmartTVs) se atascan con 204
+};
+
+// --- Activar CORS con opciones específicas ---
+app.use(cors(corsOptions));
 
 // Middlewares
-app.use(cors());
+// app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
