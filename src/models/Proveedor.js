@@ -1,8 +1,12 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Catalogo = require('./Catalogo'); // ¡IMPORTANTE! Solo importa si la necesitas para la relación inversa aquí
 
 const Proveedor = sequelize.define('Proveedor', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     nombre: {
         type: DataTypes.STRING,
         allowNull: false
@@ -23,16 +27,10 @@ const Proveedor = sequelize.define('Proveedor', {
         type: DataTypes.STRING
     }
 }, {
-    tableName: 'Proveedor', // Nombre de la tabla en la BD (singular)
-    freezeTableName: true,
-    timestamps: true // Asegúrate de que esto sea consistente. Si no quieres createdAt/updatedAt, ponlo a false.
-                     // Si lo dejas en true, tu tabla Proveedor debe tener createdAt y updatedAt.
+    tableName: 'Proveedor', // ¡IMPORTANTE! Cambia a plural si tu tabla se llama 'proveedores'
+    freezeTableName: true, // Esto evitará que Sequelize pluralice 'Proveedor' a 'Proveedores'
+    timestamps: false // Consistente con lo que hablamos. Si tu tabla tiene 'createdAt'/'updatedAt', ponlo a true.
 });
 
-// Define la relación aquí si un Proveedor puede tener muchos Catalogos
-// NOTA: Debes hacer esta asociación después de que ambos modelos (Proveedor y Catalogo) estén definidos
-// Esto se suele hacer en un archivo de relaciones o al final de tus modelos.
-// Si lo haces aquí, asegúrate de que Catalogo ya esté requerido.
-Proveedor.hasMany(Catalogo, { foreignKey: 'proveedorId' });
 
 module.exports = Proveedor;
