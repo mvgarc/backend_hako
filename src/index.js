@@ -23,19 +23,20 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const CatalogoModel = require('./models/Catalogo');
 const ProveedorModel = require('./models/Proveedor');
 const MarcaModel = require('./models/Marca');
-require('./models/Associations'); // Asegúrate de que este archivo exista y defina las asociaciones
+const UsuarioModel = require('./models/Usuario');
+require('./models/Associations'); 
 
-// Rutas
 const proveedorRoutes = require('./routes/proveedor.routes');
 const marcaRoutes = require('./routes/marca.routes');
 const catalogoRoutes = require('./routes/catalogo.routes');
+const usuarioRoutes = require('./routes/usuario.routes');
 
+app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/proveedores', proveedorRoutes);
 app.use('/api/marcas', marcaRoutes);
 app.use('/api/catalogos', catalogoRoutes);
 
-// Sincronización con la base de datos
-sequelize.sync({ alter: true }) // Correcto para desarrollo
+sequelize.sync({ alter: true })
     .then(() => {
         console.log('Conexión exitosa con la base de datos y modelos sincronizados.');
         app.listen(PORT, () => {
