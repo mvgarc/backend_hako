@@ -32,17 +32,13 @@ const Catalogo = sequelize.define('Catalogo', {
         }
     },
     publishedAt: {
-        type: DataTypes.DATE, // Tipo de dato DATE para fechas y horas
-        allowNull: false, // Asegura que siempre tenga una fecha
-        defaultValue: DataTypes.NOW // Establece la fecha y hora actual por defecto
+        type: DataTypes.DATE, 
+        allowNull: true, 
+        defaultValue: DataTypes.NOW 
     }
 }, {
     tableName: 'catalogos',
     timestamps: false // Lo mantienes en false porque quieres un campo específico
 });
-
-// Relaciones (mantén estas relaciones tal cual, o asegúrate de que están en associations.js)
-Catalogo.belongsTo(Proveedor, { foreignKey: 'proveedorId' });
-Catalogo.belongsTo(Marca, { foreignKey: 'marcaId' });
 
 module.exports = Catalogo;

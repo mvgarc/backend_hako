@@ -49,32 +49,29 @@ const crearCatalogo = async (req, res) => {
 const obtenerCatalogos = async (req, res) => {
     try {
         const catalogos = await Catalogo.findAll({
-            // ===> ESTA ES LA CLAVE PARA TRAER LOS NOMBRES DE PROVEEDORES Y MARCAS <===
             include: [
                 {
                     model: Proveedor,
-                    attributes: ['nombre'] // Solo trae el campo 'nombre' del Proveedor
+                    attributes: ['nombre']
                 },
                 {
                     model: Marca,
-                    attributes: ['nombre'] // Solo trae el campo 'nombre' de la Marca
+                    attributes: ['nombre']
                 }
             ]
         });
         
-        // Mapea los catálogos para incluir la información completa necesaria para el frontend
         const catalogosConInfoCompleta = catalogos.map((item) => {
             const proveedorNombre = item.Proveedor ? item.Proveedor.nombre : 'Desconocido';
             const marcaNombre = item.Marca ? item.Marca.nombre : 'Desconocida';
 
             return {
                 id: item.id,
-                filename: item.nombre, // 'nombre' del catálogo es el nombre original del archivo
-                provider: proveedorNombre, // <-- Aquí enviamos el nombre del proveedor
-                brand: marcaNombre,       // <-- Aquí enviamos el nombre de la marca
-                // ===> AHORA INCLUIMOS Y FORMATEAMOS EL CAMPO publishedAt <===
+                filename: item.nombre, 
+                provider: proveedorNombre, 
+                brand: marcaNombre,       
                 publishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('es-ES') : 'N/A',
-                notes: "", // Si tu modelo Catalogo tiene un campo 'notes', lo mapearías aquí: item.notes
+                notes: item.notes || "", 
                 enlaceDescarga: `${req.protocol}://${req.get('host')}/api/catalogos/download/${item.id}`
             };
         });
@@ -86,7 +83,6 @@ const obtenerCatalogos = async (req, res) => {
     }
 };
 
-// Listar catálogos por archivos en el directorio 'uploads' (Esta función no usa la DB para detalles)
 const listarCatalogos = (req, res) => {
     try {
         const directoryPath = path.join(__dirname, '../uploads');
