@@ -10,8 +10,8 @@ const PORT = process.env.PORT || 4000;
 const corsOptions = {
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'], 
-    credentials: true, 
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
     optionsSuccessStatus: 200
 };
 
@@ -25,18 +25,21 @@ const ProveedorModel = require('./models/Proveedor');
 const MarcaModel = require('./models/Marca');
 const UsuarioModel = require('./models/Usuario');
 
-require('./models/Associations'); 
+require('./models/Associations');
 
 // Importar rutas
 const proveedorRoutes = require('./routes/proveedor.routes');
 const marcaRoutes = require('./routes/marca.routes');
 const catalogoRoutes = require('./routes/catalogo.routes');
-const authRoutes = require('./routes/auth.routes'); 
+const authRoutes = require('./routes/auth.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 app.use('/api/proveedores', proveedorRoutes);
 app.use('/api/marcas', marcaRoutes);
 app.use('/api/catalogos', catalogoRoutes);
-app.use('/api/auth', authRoutes); 
+app.use('/api/auth', authRoutes);
+// *** CAMBIO AQUÍ ***
+app.use('/api', dashboardRoutes);
 
 sequelize.sync({ alter: true })
     .then(() => {

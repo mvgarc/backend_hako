@@ -62,19 +62,19 @@ const obtenerCatalogos = async (req, res) => {
         });
         
         const catalogosConInfoCompleta = catalogos.map((item) => {
-            const proveedorNombre = item.Proveedor ? item.Proveedor.nombre : 'Desconocido';
-            const marcaNombre = item.Marca ? item.Marca.nombre : 'Desconocida';
+        const proveedorNombre = item.Proveedor ? item.Proveedor.nombre : 'Desconocido';
+        const marcaNombre = item.Marca ? item.Marca.nombre : 'Desconocida';
 
-            return {
-                id: item.id,
-                filename: item.nombre, 
-                provider: proveedorNombre, 
-                brand: marcaNombre,       
-                publishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('es-ES') : 'N/A',
-                notes: item.notes || "", 
-                enlaceDescarga: `${req.protocol}://${req.get('host')}/api/catalogos/download/${item.id}`
-            };
-        });
+        return {
+            id: item.id,
+            filename: item.nombre,
+            provider: proveedorNombre,
+            brand: marcaNombre,
+            publishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('es-ES') : 'N/A',
+            notes: item.notes || "",
+            enlaceDescarga: `${req.protocol}://${req.get('host')}/api/catalogos/download/${item.id}`
+        };
+    });
         
         res.status(200).json(catalogosConInfoCompleta);
     } catch (error) {
